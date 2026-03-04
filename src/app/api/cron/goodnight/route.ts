@@ -25,34 +25,54 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Fetch toàn bộ subscription từ database
-    // Đây là thông báo broadcast (tất cả mọi người dùng)
-    const { data: subs, error } = await supabase
+    // 2. Lấy dữ liệu cặp đôi để xác định giới tính (user1 = Nam, user2 = Nữ)
+    const { data: couples, error: couplesErr } = await supabase
+      .from("couples")
+      .select("code, user1_name, user2_name");
+
+    if (couplesErr) throw couplesErr;
+
+    // 3. Lấy dữ liệu Push Subscription
+    const { data: subs, error: subsErr } = await supabase
       .from("push_subscriptions")
       .select("love_code, user_name, subscription");
 
-    if (error) {
-      console.error("Cron fetch error:", error);
-      return NextResponse.json({ error: "DB Error" }, { status: 500 });
-    }
+    if (subsErr) throw subsErr;
 
     if (!subs || subs.length === 0) {
       return NextResponse.json({ sent: 0, message: "No active subscriptions" });
     }
 
-    // 3. Chuẩn bị payload Push
-    // Lời chúc chung cho tất cả các cặp đôi
-    const payload = JSON.stringify({
-      title: "Đã khuya rồi 🌙",
-      body: "Chúc em/anh ngủ ngon và có những giấc mơ thật đẹp nhé! ❤️",
-      url: "/",
-      icon: "/icon-192x192.png",
-      badge: "/icon-192x192.png",
-    });
+    // Tạo Map để tra cứu nhanh cặp đôi theo code
+    const couplesMap = new Map(couples?.map(c => [c.code, c]));
 
-    // 4. Gửi hàng loạt
+    // 4. Gửi hàng loạt với nội dung cá nhân hoá do Role
     const results = await Promise.allSettled(
-      subs.map((row) => webpush.sendNotification(row.subscription as any, payload)),
+      subs.map((row) => {
+        const couple = couplesMap.get(row.love_code);
+        
+        // Mặc định xưng hô (fallback)
+        let pronoun = "em/anh"; 
+        
+        // Match tên để xác định Nam/Nữ
+        if (couple) {
+          if (row.user_name === couple.user1_name) {
+             pronoun = "anh"; // user1 = Nam
+          } else if (row.user_name === couple.user2_name) {
+             pronoun = "em"; // user2 = Nữ
+          }
+        }
+
+        const payload = JSON.stringify({
+          title: "Đã khuya rồi 🌙",
+          body: `Chúc ${pronoun} ngủ ngon và có những giấc mơ thật đẹp nhé! ❤️`,
+          url: "/",
+          icon: "/icon-192x192.png",
+          badge: "/icon-192x192.png",
+        });
+
+        return webpush.sendNotification(row.subscription as any, payload);
+      })
     );
 
     const sent = results.filter((r) => r.status === "fulfilled").length;
