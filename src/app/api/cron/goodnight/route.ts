@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
         const couple = couplesMap.get(row.love_code);
         
         // Mặc định xưng hô (fallback)
-        let pronoun = "em/anh"; 
+        let pronoun = "tình yêu"; 
         
         // Match tên để xác định Nam/Nữ
         if (couple) {
