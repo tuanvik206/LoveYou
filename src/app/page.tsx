@@ -286,9 +286,7 @@ export default function Home() {
     if (!myGender) return quoteOfDay;
     const self = myGender === "male" ? "anh" : "em";
     const partner = myGender === "male" ? "em" : "anh";
-    return quoteOfDay
-      .replace(/anh\/em/gi, self)
-      .replace(/em\/anh/gi, partner);
+    return quoteOfDay.replace(/anh\/em/gi, self).replace(/em\/anh/gi, partner);
   }, [quoteOfDay, myGender]);
 
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);

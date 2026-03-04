@@ -64,11 +64,10 @@ export default function AuthProvider({
 
       if (!session) {
         clear();
+        setIsLoading(false);
         if (!isPublicRoute) {
           router.replace("/auth/login");
-          return; // giữ overlay cho đến khi navigation xong
         }
-        setIsLoading(false);
         return;
       }
 
@@ -126,8 +125,9 @@ export default function AuthProvider({
         } else {
           // Chưa có profile → onboarding
           if (!isPublicRoute && path !== "/onboarding") {
+            setIsLoading(false);
             router.replace("/onboarding");
-            return; // giữ overlay
+            return;
           }
         }
       }
@@ -135,7 +135,7 @@ export default function AuthProvider({
       // Redirect nếu đang ở public route
       if (isPublicRoute) {
         router.replace(hasProfile ? "/" : "/onboarding");
-        return; // giữ overlay
+        return;
       }
 
       setIsLoading(false);

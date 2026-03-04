@@ -34,6 +34,7 @@ export const metadata: Metadata = {
 import AuthProvider from "@/components/providers/AuthProvider";
 import BottomNav from "@/components/ui/bottom-nav";
 import ServiceWorkerRegister from "@/components/providers/ServiceWorkerRegister";
+import FallingPetals from "@/components/ui/FallingPetals";
 
 export const viewport = {
   themeColor: "#ffe4e6", // love-100
@@ -56,6 +57,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ServiceWorkerRegister />
+          <FallingPetals />
           {children}
           <BottomNav />
         </AuthProvider>

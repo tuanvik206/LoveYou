@@ -14,6 +14,7 @@ import {
   Sparkles,
   Bell,
   BellOff,
+  Unlink,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useConfirm } from "@/hooks/useConfirm";
@@ -152,6 +153,45 @@ export default function SettingsPage() {
       confirmLabel: "Đăng xuất",
       variant: "warning",
       onConfirm: doLogout,
+    });
+  };
+
+  const doUnlink = async () => {
+    if (!loveCode) return;
+    setIsLoading(true);
+    try {
+      // Xoá toàn bộ dữ liệu theo loveCode
+      await Promise.all([
+        supabase.from("messages").delete().eq("love_code", loveCode),
+        supabase.from("diary_entries").delete().eq("love_code", loveCode),
+        supabase.from("daily_checkins").delete().eq("love_code", loveCode),
+        supabase.from("scheduled_messages").delete().eq("love_code", loveCode),
+        supabase.from("love_places").delete().eq("love_code", loveCode),
+        supabase.from("wish_items").delete().eq("love_code", loveCode),
+        supabase.from("photos").delete().eq("love_code", loveCode),
+        supabase.from("push_subscriptions").delete().eq("love_code", loveCode),
+        supabase.from("user_profiles").delete().eq("love_code", loveCode),
+      ]);
+      // Xoá couple cuối cùng
+      await supabase.from("couples").delete().eq("code", loveCode);
+      await supabase.auth.signOut();
+      clear();
+      router.replace("/auth/login");
+    } catch {
+      showToast("Có lỗi khi hủy liên kết. Thử lại nhé!", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUnlink = () => {
+    showConfirm({
+      title: "Hủy liên kết?",
+      message:
+        "Toàn bộ tin nhắn, nhật ký, ảnh, địa điểm và dữ liệu của cả hai sẽ bị xóa vĩnh viễn. Không thể khôi phục!",
+      confirmLabel: "Xóa tất cả & Hủy liên kết",
+      variant: "danger",
+      onConfirm: doUnlink,
     });
   };
 
@@ -652,6 +692,14 @@ export default function SettingsPage() {
               className="w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 text-red-500 border-2 border-red-100 hover:bg-red-50 transition-all active:scale-[0.98]"
             >
               <LogOut className="w-5 h-5" /> Đăng xuất
+            </button>
+            <button
+              type="button"
+              onClick={handleUnlink}
+              disabled={isLoading}
+              className="w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 text-white bg-red-500 hover:bg-red-600 transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              <Unlink className="w-5 h-5" /> Hủy liên kết & Xóa tất cả
             </button>
           </div>
         </section>
