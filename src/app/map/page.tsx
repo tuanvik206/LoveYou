@@ -251,6 +251,35 @@ export default function MapPage() {
       }
     };
     fetchInitial();
+
+    // Polling 10s làm backup khi realtime bị trễ hoặc miss event
+    const pollPartner = async () => {
+      const { data } = await supabase
+        .from("couples")
+        .select(
+          "user1_lat,user1_lng,user2_lat,user2_lng,user1_battery,user1_charging,user2_battery,user2_charging",
+        )
+        .eq("code", loveCode)
+        .single();
+      if (!data) return;
+      if (role === "user1") {
+        if (data.user2_lat)
+          setPartnerLoc((prev) =>
+            prev && prev.lat === data.user2_lat && prev.lng === data.user2_lng
+              ? prev
+              : { lat: data.user2_lat, lng: data.user2_lng },
+          );
+      } else {
+        if (data.user1_lat)
+          setPartnerLoc((prev) =>
+            prev && prev.lat === data.user1_lat && prev.lng === data.user1_lng
+              ? prev
+              : { lat: data.user1_lat, lng: data.user1_lng },
+          );
+      }
+    };
+    const pollTimer = setInterval(pollPartner, 10_000);
+
     const channel = supabase
       .channel(`map_${loveCode}`)
       .on(
@@ -293,11 +322,10 @@ export default function MapPage() {
       )
       .subscribe();
     return () => {
+      clearInterval(pollTimer);
       supabase.removeChannel(channel);
     };
   }, [isMounted, loveCode, role]);
-
-  // Love places: fetch + realtime
   useEffect(() => {
     if (!isMounted || !loveCode) return;
     const fetchLovePlaces = async () => {
@@ -405,12 +433,12 @@ export default function MapPage() {
         setRecenterKey((k) => k + 1);
       }
 
-      // Upload lên Supabase (throttle 8s, bỏ qua nếu accuracy > 200m)
+      // Upload lên Supabase (throttle 5s, bỏ qua nếu accuracy > 300m)
       const now = Date.now();
       const isFirstUpload = lastGPSUploadRef.current === 0;
       if (
         !isFirstUpload &&
-        (now - lastGPSUploadRef.current < 8_000 || accuracy > 200)
+        (now - lastGPSUploadRef.current < 5_000 || accuracy > 300)
       )
         return;
       lastGPSUploadRef.current = now;
@@ -434,7 +462,7 @@ export default function MapPage() {
       await supabase.from("couples").update(fields).eq("code", loveCode);
     };
 
-    // Bước 1: Lấy vị trí từ cache ngay lập tức (< 30s cũ) → hiện thị ngay
+    // Bước 1: Lấy vị trí từ cache ngay lập tức (< 2 phút cũ) → hiển thị ngay
     navigator.geolocation.getCurrentPosition(
       (pos) =>
         applyPosition(
@@ -443,7 +471,7 @@ export default function MapPage() {
           pos.coords.accuracy,
         ),
       () => {}, // bỏ qua lỗi cache — watchPosition sẽ lấy vị trí mới
-      { enableHighAccuracy: false, maximumAge: 30_000, timeout: 2_000 },
+      { enableHighAccuracy: false, maximumAge: 120_000, timeout: 3_000 },
     );
 
     // Bước 2: Watch liên tục với độ chính xác cao → cập nhật progressive
@@ -465,10 +493,10 @@ export default function MapPage() {
               pos.coords.accuracy,
             ),
           () => {},
-          { enableHighAccuracy: false, maximumAge: 10_000, timeout: 30_000 },
+          { enableHighAccuracy: false, maximumAge: 30_000, timeout: 20_000 },
         );
       },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 },
+      { enableHighAccuracy: true, maximumAge: 5_000, timeout: 8_000 },
     );
 
     return () => {
