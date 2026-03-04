@@ -256,6 +256,7 @@ CREATE POLICY "Anyone can delete photos" ON photos FOR DELETE USING (true);
 DROP POLICY IF EXISTS "Anyone can upsert push_subscriptions" ON push_subscriptions;
 DROP POLICY IF EXISTS "Anyone can read push_subscriptions"   ON push_subscriptions;
 DROP POLICY IF EXISTS "Anyone can delete push_subscriptions" ON push_subscriptions;
+DROP POLICY IF EXISTS "Anyone can update push_subscriptions" ON push_subscriptions;
 
 CREATE POLICY "Anyone can upsert push_subscriptions" ON push_subscriptions FOR INSERT WITH CHECK (true);
 CREATE POLICY "Anyone can read push_subscriptions"   ON push_subscriptions FOR SELECT USING (true);

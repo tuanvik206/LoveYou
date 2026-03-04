@@ -66,9 +66,11 @@ export async function sendPushToPartner(
   url = "/",
 ): Promise<void> {
   try {
-    await fetch("/api/send-push", {
+    // keepalive: true — request hoàn thành ngay cả khi navigate sang trang khác
+    fetch("/api/send-push", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      keepalive: true,
       body: JSON.stringify({
         love_code: loveCode,
         sender_name: senderName,
@@ -76,9 +78,9 @@ export async function sendPushToPartner(
         body,
         url,
       }),
-    });
+    }).catch(() => {});
   } catch {
-    // silent — thông báo push không được ảnh hưởng đến UX chính
+    // silent
   }
 }
 
