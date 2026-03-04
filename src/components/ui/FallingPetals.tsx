@@ -25,70 +25,87 @@ function seeded(seed: number, mul: number, mod: number): number {
   return (seed * mul + 13) % mod;
 }
 
-// Hình cánh hoa đào sakura — 2 thùy trên, nhọn dưới, có gân giữa
+// Cánh hoa đào đơn — hình trứng rộng trên, nhọn dưới, có rãnh nhỏ ở đỉnh
 function Petal({ color, size }: { color: string; size: number }) {
-  // Màu đậm hơn một chút cho viền & gân
-  const vein = "rgba(255,255,255,0.55)";
+  const vein = "rgba(255,255,255,0.6)";
+  // Màu nhạt hơn cho gradient bên trong
   return (
     <svg
-      width={size * 0.72}
+      width={size * 0.78}
       height={size}
-      viewBox="0 0 22 30"
+      viewBox="0 0 24 32"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Cánh hoa: 2 thùy trên (rãnh ở đỉnh), nhọn ở đáy */}
+      <defs>
+        <radialGradient id={`pg${size}`} cx="45%" cy="35%" r="60%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.35" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* Thân cánh: rộng ở trên, nhọn ở dưới, hơi bất đối xứng cho tự nhiên */}
       <path
-        d="M11 28
-           C5 23, 1 17, 1.5 11
-           C2 5, 6 1, 8.5 1.5
-           C9.5 1.7, 10.5 3.5, 11 3.5
-           C11.5 3.5, 12.5 1.7, 13.5 1.5
-           C16 1, 20 5, 20.5 11
-           C21 17, 17 23, 11 28 Z"
+        d="M12 31
+           C7 27, 1 21, 1 13
+           C1 5.5, 5.5 1, 9.8 1.3
+           C10.8 1.4, 11.5 3, 12 3
+           C12.5 3, 13.2 1.4, 14.2 1.3
+           C18.5 1, 23 5.5, 23 13
+           C23 21, 17 27, 12 31 Z"
         fill={color}
-        fillOpacity="0.88"
+        fillOpacity="0.86"
       />
-      {/* Rãnh nhỏ ở đỉnh (đặc trưng sakura) */}
+      {/* Highlight bóng sáng */}
       <path
-        d="M9.5 1.8 Q11 4.5 12.5 1.8"
+        d="M12 31
+           C7 27, 1 21, 1 13
+           C1 5.5, 5.5 1, 9.8 1.3
+           C10.8 1.4, 11.5 3, 12 3
+           C12.5 3, 13.2 1.4, 14.2 1.3
+           C18.5 1, 23 5.5, 23 13
+           C23 21, 17 27, 12 31 Z"
+        fill={`url(#pg${size})`}
+      />
+      {/* Rãnh đặc trưng sakura ở đỉnh */}
+      <path
+        d="M10.2 1.5 Q12 4.2 13.8 1.5"
         stroke={vein}
-        strokeWidth="0.8"
+        strokeWidth="0.9"
         strokeLinecap="round"
         fill="none"
       />
       {/* Gân giữa */}
       <path
-        d="M11 5 Q11.4 16 11 27"
+        d="M12 4.5 Q12.5 17 12 30"
         stroke={vein}
-        strokeWidth="0.7"
+        strokeWidth="0.75"
         strokeLinecap="round"
         fill="none"
       />
-      {/* Gân phụ trái & phải */}
+      {/* Gân nhánh */}
       <path
-        d="M11 10 Q8 13 5 12"
-        stroke={vein}
-        strokeWidth="0.45"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M11 10 Q14 13 17 12"
+        d="M12 11 Q9 14 5.5 13"
         stroke={vein}
         strokeWidth="0.45"
         strokeLinecap="round"
         fill="none"
       />
       <path
-        d="M11 17 Q8 20 6 18.5"
+        d="M12 11 Q15 14 18.5 13"
+        stroke={vein}
+        strokeWidth="0.45"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M12 19 Q9 22 6.5 20.5"
         stroke={vein}
         strokeWidth="0.35"
         strokeLinecap="round"
         fill="none"
       />
       <path
-        d="M11 17 Q14 20 16 18.5"
+        d="M12 19 Q15 22 17.5 20.5"
         stroke={vein}
         strokeWidth="0.35"
         strokeLinecap="round"
@@ -110,7 +127,7 @@ const PETAL_CONFIGS = Array.from({ length: COUNT }, (_, i) => {
     left: 3 + seeded(i, 47, 90), // 3–92% — tránh sát rìa
     delay,
     dur,
-    size: 18 + seeded(i, 23, 16), // 18–33px
+    size: 10 + seeded(i, 23, 9), // 10–18px
     swing: (seeded(i, 11, 70) - 35) * 1.2, // –42..41px
     rot: seeded(i, 37, 360),
     color: COLORS[i % COLORS.length],
@@ -163,10 +180,10 @@ export default function FallingPetals() {
 
   return (
     <>
-      {/* Cánh hoa rơi */}
+      {/* Cánh hoa rơi — z-[1] để luôn nằm sau tất cả card/content */}
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[45] overflow-hidden"
+        className="pointer-events-none fixed inset-0 z-[1] overflow-hidden"
       >
         {PETAL_CONFIGS.map((cfg, i) => (
           <span
