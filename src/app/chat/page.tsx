@@ -461,12 +461,12 @@ export default function ChatPage() {
         // Gửi Web Push nền cho người nhận (kể cả khi app đóng)
         if (partner?.name) {
           const pushBody = textToSend
-            ? textToSend.slice(0, 80)
+            ? textToSend.slice(0, 100)
             : "📷 Đã gửi một ảnh";
           sendPushToPartner(
             loveCode!,
             user!.name,
-            `💬 ${user!.name}`,
+            `💬 ${user!.name} vừa nhắn`,
             pushBody,
             "/chat",
           );

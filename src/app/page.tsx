@@ -545,8 +545,8 @@ export default function Home() {
     sendPushToPartner(
       loveCode,
       user.name,
-      `💓 ${user.name} đang nghĩ đến bạn!`,
-      "Một cái ôm từ xa 🤗",
+      `� ${user.name} đang nhớ bạn`,
+      `"Đang nghĩ đến bạn rất nhiều..." 🥰`,
       "/",
     );
     setNudgeSending(false);
