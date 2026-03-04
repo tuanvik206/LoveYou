@@ -28,20 +28,21 @@ export interface LovePlace {
   visited_at: string;
 }
 
-// OSM raster tile style — bulletproof, no sprite errors
-const MAP_STYLE = {
+// Google Maps Satellite Hybrid (Vệ tinh siêu nét + Địa chỉ/Tên đường)
+const MAP_STYLE_SATELLITE = {
   version: 8 as const,
-  glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
   sources: {
-    osm: {
+    "google-hybrid": {
       type: "raster" as const,
-      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tiles: [
+        "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+      ],
       tileSize: 256,
-      attribution: "© OpenStreetMap contributors",
-      maxzoom: 19,
+      attribution: "Map data © Google",
+      maxzoom: 21,
     },
   },
-  layers: [{ id: "osm-tiles", type: "raster" as const, source: "osm" }],
+  layers: [{ id: "google-hybrid-tiles", type: "raster" as const, source: "google-hybrid" }],
 };
 
 interface Props {
@@ -66,12 +67,71 @@ interface Props {
 function BatteryBadge({ battery }: { battery: BatteryInfo }) {
   if (!battery) return null;
   const { level, charging } = battery;
-  const color = level <= 20 ? "#ef4444" : level <= 50 ? "#f59e0b" : "#22c55e";
+  
+  // Xác định màu pin
+  let color = "#22c55e"; // xanh
+  if (level <= 20) color = "#ef4444"; // đỏ
+  else if (level <= 50) color = "#f59e0b"; // vàng
+
   return (
-    <span style={{ color, fontWeight: 700, fontSize: 10 }}>
-      {charging ? "⚡" : ""}
-      {level}%
-    </span>
+    <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+      {/* Battery outline container */}
+      <div
+        style={{
+          width: 22,
+          height: 10,
+          border: `1px solid ${color}`,
+          borderRadius: 3,
+          padding: 1,
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          opacity: 0.9,
+        }}
+      >
+        {/* Battery level fill */}
+        <div
+          style={{
+            height: "100%",
+            width: `${level}%`,
+            backgroundColor: color,
+            borderRadius: 1.5,
+            transition: "width 0.3s ease",
+          }}
+        />
+        {/* Charging icon overlay */}
+        {charging && (
+          <span 
+            style={{ 
+              position: "absolute", 
+              left: "50%", 
+              top: "50%", 
+              transform: "translate(-50%, -50%)", 
+              fontSize: 8, 
+              lineHeight: 1,
+              color: level < 40 ? color : "#fff",
+              textShadow: "0px 0px 2px rgba(0,0,0,0.3)"
+            }}
+          >
+            ⚡
+          </span>
+        )}
+      </div>
+      {/* Battery tip */}
+      <div 
+        style={{ 
+          width: 2, 
+          height: 4, 
+          backgroundColor: color, 
+          borderRadius: "0 2px 2px 0",
+          opacity: 0.8
+        }} 
+      />
+      {/* Percentage text */}
+      <span style={{ color, fontWeight: 800, fontSize: 10, marginLeft: 2, letterSpacing: "-0.5px" }}>
+        {level}%
+      </span>
+    </div>
   );
 }
 
@@ -120,7 +180,7 @@ const AvatarMarker = memo(function AvatarMarker({
         {label}
         {battery && (
           <>
-            <span style={{ opacity: 0.35 }}>·</span>
+            <span style={{ opacity: 0.2, margin: "0 2px" }}>|</span>
             <BatteryBadge battery={battery} />
           </>
         )}
@@ -162,44 +222,68 @@ const LovePlaceMarker = memo(function LovePlaceMarker({
 }) {
   return (
     <div
-      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        filter: "drop-shadow(0 4px 12px rgba(244,63,94,0.35))",
+        cursor: "pointer",
+        transition: "transform 0.2s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
     >
       <div
         style={{
-          background: "linear-gradient(135deg, #f43f5e, #ec4899)",
-          color: "#fff",
+          background: "#fff",
+          border: "2px solid #f43f5e",
+          color: "#f43f5e",
           fontSize: 11,
           fontWeight: 700,
-          padding: "3px 10px",
-          borderRadius: 99,
+          padding: "4px 12px",
+          borderRadius: "16px",
           whiteSpace: "nowrap",
-          maxWidth: 150,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          boxShadow: "0 2px 10px rgba(244,63,94,0.45)",
+          maxWidth: 160,
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          gap: 3,
+          gap: 2,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
         }}
       >
-        <span style={{ fontSize: 12 }}>💕</span>
+        <div style={{ fontSize: 16, lineHeight: 1 }}>📍</div>
         <span
           style={{
-            maxWidth: 115,
+            maxWidth: 140,
             overflow: "hidden",
             textOverflow: "ellipsis",
+            textAlign: "center",
           }}
         >
           {place.name}
         </span>
       </div>
+      {/* Triangle tip pointing down */}
       <div
         style={{
           width: 0,
           height: 0,
-          borderLeft: "5px solid transparent",
-          borderRight: "5px solid transparent",
-          borderTop: "7px solid #f43f5e",
+          borderLeft: "6px solid transparent",
+          borderRight: "6px solid transparent",
+          borderTop: "8px solid #f43f5e",
+          marginTop: -2,
+        }}
+      />
+      <div
+        style={{
+          width: 0,
+          height: 0,
+          borderLeft: "4px solid transparent",
+          borderRight: "4px solid transparent",
+          borderTop: "6px solid #fff",
+          position: "absolute",
+          bottom: 2,
+          zIndex: 1,
         }}
       />
     </div>
@@ -230,12 +314,11 @@ const MapView = memo(function MapView({
 
   useEffect(() => {
     if (!flyTarget || !mapRef.current) return;
-    const map = mapRef.current.getMap();
-    if (!map || !map.loaded()) return; // will retry in handleLoad
     mapRef.current.flyTo({
       center: [flyTarget.lng, flyTarget.lat],
-      zoom: 16,
-      duration: 1200,
+      zoom: 18,
+      duration: 1500,
+      essential: true,
     });
     // recenterKey forces re-fly even when coords unchanged
   }, [flyTarget?.lat, flyTarget?.lng, recenterKey]);
@@ -254,8 +337,9 @@ const MapView = memo(function MapView({
     if (flyTargetRef.current) {
       mapRef.current.flyTo({
         center: [flyTargetRef.current.lng, flyTargetRef.current.lat],
-        zoom: 16,
-        duration: 1200,
+        zoom: 18,
+        duration: 1500,
+        essential: true,
       });
     }
     const c = mapRef.current.getCenter();
@@ -294,7 +378,7 @@ const MapView = memo(function MapView({
         zoom: 14,
       }}
       style={{ width: "100%", height: "100%" }}
-      mapStyle={MAP_STYLE as any}
+      mapStyle={MAP_STYLE_SATELLITE as any}
       onLoad={handleLoad}
       onMove={handleMove}
       onMoveEnd={handleMove}

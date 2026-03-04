@@ -594,16 +594,19 @@ export default function MapPage() {
   );
 
   const handleRoute = useCallback(async () => {
-    if (!myLoc || !partnerLoc) return;
+    // Ưu tiên chỉ đường tới điểm Search trước. Nếu không có mới tới Partner
+    const destination = searchMarker ?? partnerLoc;
+    
+    if (!myLoc || !destination) return;
     setIsRouting(true);
     setRouteCoords(null);
     try {
-      const coords = await fetchRoute(myLoc, partnerLoc);
+      const coords = await fetchRoute(myLoc, destination);
       setRouteCoords(coords);
     } finally {
       setIsRouting(false);
     }
-  }, [myLoc, partnerLoc]);
+  }, [myLoc, partnerLoc, searchMarker]);
 
   if (!isMounted || !user || !partner) return null;
 
@@ -613,6 +616,13 @@ export default function MapPage() {
         className="relative w-full overflow-hidden"
         style={{ height: "100dvh" }}
       >
+        <style dangerouslySetInnerHTML={{__html: `
+          .maplibregl-ctrl-bottom-right,
+          .maplibregl-ctrl-bottom-left {
+            display: none !important;
+          }
+        `}} />
+        
         {/* ── Map ── */}
         <MapView
           myLoc={myLoc}
@@ -639,8 +649,8 @@ export default function MapPage() {
         >
           <div className="flex items-start gap-2 pointer-events-auto">
             {/* Distance + GPS card */}
-            <div className="flex-1 bg-white/90 backdrop-blur-md rounded-2xl px-4 py-2.5 shadow-sm border border-rose-100/60">
-              <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex-1 bg-white/90 backdrop-blur-md rounded-2xl px-4 py-2.5 shadow-sm border border-rose-100/60 flex items-center justify-between flex-wrap gap-y-1">
+              <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-gray-800">Bản đồ</span>
                 <span className="text-rose-400 text-sm">·</span>
                 <span className="text-xs font-semibold text-rose-500">
@@ -657,6 +667,57 @@ export default function MapPage() {
                     }`}
                   >
                     ±{gpsAccuracy}m
+                  </span>
+                )}
+              </div>
+              
+              {/* Pin đối phương luôn hiện - Đẩy sang bên phải hoặc dòng dưới gọn gàng */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-semibold text-gray-500">
+                  Pin {partner.name}:
+                </span>
+                {partnerBattery != null ? (
+                  <>
+                    <span
+                      className={`text-[11px] font-bold ${
+                        partnerBattery.level <= 20
+                          ? "text-red-500"
+                          : partnerBattery.level <= 50
+                            ? "text-amber-500"
+                            : "text-green-500"
+                      }`}
+                    >
+                      {partnerBattery.charging ? "⚡ " : ""}
+                      {partnerBattery.level}%
+                    </span>
+                    
+                    {/* Cảnh báo pin yếu & nhắc sạc */}
+                    {partnerBattery.level <= 20 && !partnerBattery.charging && (
+                      <button
+                        onClick={async () => {
+                          import("@/lib/pushUtils").then(({ sendPushToPartner }) => {
+                            if (loveCode && user?.name) {
+                              sendPushToPartner(
+                                loveCode,
+                                user.name,
+                                "Điện thoại sắp hết pin kìa!!! 😡",
+                                `Pin em/anh chỉ còn ${partnerBattery.level}%, mau đi sạc đi!`,
+                                "/map"
+                              );
+                              // Optional: hiện Toast 
+                              import("@/hooks/useToast").then(() => {}); 
+                            }
+                          });
+                        }}
+                        className="ml-auto bg-red-100 text-red-600 hover:bg-red-200 transition-colors px-2 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-1"
+                      >
+                        <span className="animate-pulse">⚠️ Báo sạc ngay</span>
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-[11px] font-bold text-gray-400">
+                    Không rõ (Off/iOS)
                   </span>
                 )}
               </div>
@@ -784,7 +845,7 @@ export default function MapPage() {
           </motion.button>
 
           {/* Route / Clear route */}
-          {myLoc && partnerLoc && (
+          {((myLoc && partnerLoc) || (myLoc && searchMarker)) && (
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={routeCoords ? () => setRouteCoords(null) : handleRoute}
@@ -792,7 +853,9 @@ export default function MapPage() {
               className={`w-11 h-11 rounded-full shadow-lg flex items-center justify-center border transition-colors disabled:opacity-60 ${
                 routeCoords
                   ? "bg-white text-gray-500 border-gray-200"
-                  : "bg-rose-500 text-white border-rose-400"
+                  : searchMarker 
+                    ? "bg-blue-500 text-white border-blue-400"
+                    : "bg-rose-500 text-white border-rose-400"
               }`}
             >
               {isRouting ? (
