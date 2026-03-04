@@ -45,10 +45,13 @@ export default function AuthProvider({
   // checkAuthStatus ổn định (không phụ thuộc pathname/user/partner/loveCode)
   // Đọc từ refs bên trong để luôn có giá trị mới nhất
   const checkAuthStatus = useCallback(async () => {
+    // Safety timeout: nếu sau 4 giây vẫn chưa xong → ẩn spinner để tránh treo UI
+    const timeout = setTimeout(() => setIsLoading(false), 4000);
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      clearTimeout(timeout);
 
       const path = pathnameRef.current;
       const isPublicRoute = PUBLIC_ROUTES.includes(path);
@@ -132,6 +135,7 @@ export default function AuthProvider({
 
       setIsLoading(false);
     } catch {
+      clearTimeout(timeout);
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
