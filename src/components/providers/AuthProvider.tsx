@@ -32,7 +32,11 @@ export default function AuthProvider({
     setPartnerOnline,
   } = useStore();
 
-  const [isLoading, setIsLoading] = useState(true);
+  // Public routes không cần spinner — chỉ cần spinner trên protected routes
+  // để tránh flash content trước khi auth được xác nhận
+  const [isLoading, setIsLoading] = useState(
+    () => !PUBLIC_ROUTES.includes(pathname),
+  );
 
   // Refs để tránh stale closure mà không cần recreate callback
   const pathnameRef = useRef(pathname);
