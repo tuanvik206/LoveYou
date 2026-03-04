@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-love-50: #fff1f2;
+  --color-love-100: #ffe4e6;
+  --color-love-200: #fecdd3;
+  --color-love-300: #fda4af;
+  --color-love-400: #fb7185;
+  --color-love-500: #f43f5e;
+  --color-love-600: #e11d48;
+
+  --color-pure-50: #f8fafc;
+  --color-pure-100: #f1f5f9;
+  --color-pure-200: #e2e8f0;
+  --color-pure-300: #cbd5e1;
+
+  --color-background: #ffffff;
+  --color-foreground: #334155;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --background: #fffbfe;
+  --foreground: #4a4a4a;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+/* Optimize page transitions */
+@view-transition {
+  navigation: auto;
+}
+
+/* Reduce layout shift */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for a cleaner mobile-like app feel */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/70 backdrop-blur-xl border border-white/50 shadow-sm;
+  }
+
+  .safe-pt {
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
+
+  .safe-pb {
+    padding-bottom: max(5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* react-image-gallery lightbox overrides */
+.rig-lightbox .image-gallery-slide img {
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.rig-lightbox .image-gallery-slide-wrapper {
+  background: transparent;
+}
+.rig-lightbox .image-gallery-icon {
+  color: #fff;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+}
+.rig-lightbox .image-gallery-icon:hover {
+  color: #fda4af;
+}
+.rig-lightbox .image-gallery-thumbnail.active,
+.rig-lightbox .image-gallery-thumbnail:hover {
+  border-color: #f43f5e;
+}
