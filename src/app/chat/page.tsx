@@ -53,6 +53,7 @@ export default function ChatPage() {
   const { toast, showToast, hideToast } = useToast();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -97,18 +98,42 @@ export default function ChatPage() {
   const loadingMoreRef = useRef(false);
 
   const scrollToBottom = useCallback((instant = false) => {
-    requestAnimationFrame(() => {
+    // setTimeout 0 đảm bảo render xong mới scroll
+    setTimeout(() => {
+      const el = scrollContainerRef.current as HTMLElement | null;
+      if (el) {
+        el.scrollTop = el.scrollHeight;
+        return;
+      }
       messagesEndRef.current?.scrollIntoView({
         behavior: instant ? "instant" : "smooth",
+        block: "end",
       });
-    });
+    }, 0);
   }, []);
 
   useEffect(() => {
     if (messages.length === 0 || loadingMoreRef.current) return;
-    scrollToBottom(isInitialLoad.current);
+    scrollToBottom(true);
     isInitialLoad.current = false;
   }, [messages.length, scrollToBottom]);
+
+  // Scroll thêm lần nữa sau khi loading spinner biến mất (DOM đầy đủ)
+  useEffect(() => {
+    if (!isLoadingMessages && messages.length > 0) {
+      // setTimeout lớn hơn để đợi animation/image
+      setTimeout(() => {
+        const el = scrollContainerRef.current as HTMLElement | null;
+        if (el) el.scrollTop = el.scrollHeight;
+        else
+          messagesEndRef.current?.scrollIntoView({
+            behavior: "instant",
+            block: "end",
+          });
+      }, 80);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingMessages]);
 
   // Gộp tin nhắn cùng người gửi trong vòng 2 phút (kiểu Messenger)
   const GROUP_GAP_MS = 2 * 60 * 1000;
@@ -373,11 +398,14 @@ export default function ChatPage() {
   };
 
   const uploadChatImage = async (file: File): Promise<string | null> => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${loveCode}-${Date.now()}.${fileExt}`;
+    const fileName = `${loveCode}-${Date.now()}.jpg`;
     const { data, error } = await supabase.storage
       .from("chat-images")
-      .upload(fileName, file, { cacheControl: "3600", upsert: false });
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: "image/jpeg",
+      });
     if (error) {
       return null;
     }
@@ -428,6 +456,8 @@ export default function ChatPage() {
       } else if (data) {
         // Optimistic update: Thêm tin nhắn ngay vào UI
         setMessages((prev) => [...prev, data as Message]);
+        // Cuộn xuống tin nhắn mới nhất ngay lập tức
+        scrollToBottom(true);
         // Gửi Web Push nền cho người nhận (kể cả khi app đóng)
         if (partner?.name) {
           const pushBody = textToSend
@@ -526,7 +556,10 @@ export default function ChatPage() {
         </header>
 
         {/* ── Messages Area ── */}
-        <section className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-1">
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-1"
+        >
           {/* Nút tải thêm */}
           {hasMore && (
             <button
@@ -746,7 +779,7 @@ export default function ChatPage() {
             </>
           )}
           <div ref={messagesEndRef} />
-        </section>
+        </div>
 
         {/* ── Input Area ── sits at bottom of flex, padding clears the fixed bottom nav */}
         <div
