@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     // 2. Lấy dữ liệu cặp đôi để xác định giới tính (user1 = Nam, user2 = Nữ)
     const { data: couples, error: couplesErr } = await supabase
       .from("couples")
-      .select("code, user1_name, user2_name");
+      .select("code, user1, user2");
 
     if (couplesErr) throw couplesErr;
 
@@ -56,9 +56,9 @@ export async function GET(req: NextRequest) {
         
         // Match tên để xác định Nam/Nữ
         if (couple) {
-          if (row.user_name === couple.user1_name) {
+          if (row.user_name === couple.user1) {
              pronoun = "anh"; // user1 = Nam
-          } else if (row.user_name === couple.user2_name) {
+          } else if (row.user_name === couple.user2) {
              pronoun = "em"; // user2 = Nữ
           }
         }
