@@ -281,6 +281,16 @@ export default function Home() {
   }, [days]);
 
   const [quoteOfDay, setQuoteOfDay] = useState(DAILY_QUOTES[0]);
+
+  const resolvedQuote = useMemo(() => {
+    if (!myGender) return quoteOfDay;
+    const self = myGender === "male" ? "anh" : "em";
+    const partner = myGender === "male" ? "em" : "anh";
+    return quoteOfDay
+      .replace(/anh\/em/gi, self)
+      .replace(/em\/anh/gi, partner);
+  }, [quoteOfDay, myGender]);
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showStreakTooltip, setShowStreakTooltip] = useState(false);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
@@ -864,7 +874,7 @@ export default function Home() {
           <div className="relative z-10 flex items-start gap-2">
             <Quote className="w-4 h-4 text-white/50 shrink-0 mt-0.5" />
             <p className="font-medium text-sm text-white leading-relaxed">
-              "{quoteOfDay}"
+              "{resolvedQuote}"
             </p>
           </div>
         </div>
