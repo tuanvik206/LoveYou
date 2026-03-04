@@ -24,6 +24,7 @@ import { calculateAge, getZodiacSign } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useNotification } from "@/hooks/useNotification";
 import { useStreak } from "@/hooks/useStreak";
+import { sendPushToPartner } from "@/lib/pushUtils";
 
 const MOODS = [
   {
@@ -532,6 +533,14 @@ export default function Home() {
         last_nudge_by: user.name,
       })
       .eq("code", loveCode);
+    // Gửi Web Push nền — không cần app mở
+    sendPushToPartner(
+      loveCode,
+      user.name,
+      `💓 ${user.name} đang nghĩ đến bạn!`,
+      "Một cái ôm từ xa 🤗",
+      "/",
+    );
     setNudgeSending(false);
     setNudgeSent(true);
     setTimeout(() => setNudgeSent(false), 3000);

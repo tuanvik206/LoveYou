@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { useConfirm } from "@/hooks/useConfirm";
 import Toast from "@/components/ui/Toast";
 import { useToast } from "@/hooks/useToast";
+import { subscribeToPush } from "@/lib/pushUtils";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -66,8 +67,15 @@ export default function SettingsPage() {
     if (typeof Notification === "undefined") return;
     const result = await Notification.requestPermission();
     setNotifPermission(result);
-    if (result === "granted") showToast("Đã bật thông báo! 🔔", "success");
-    else showToast("Bạn đã tắt thông báo.", "info");
+    if (result === "granted") {
+      // Đăng ký Web Push để nhận thông báo khi app đóng
+      if (loveCode && user?.name) {
+        await subscribeToPush(loveCode, user.name);
+      }
+      showToast("Đã bật thông báo nền! 🔔", "success");
+    } else {
+      showToast("Bạn đã tắt thông báo.", "info");
+    }
   };
   const avatarFileRef = useRef<HTMLInputElement>(null);
   const partnerAvatarFileRef = useRef<HTMLInputElement>(null);

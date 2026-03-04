@@ -139,6 +139,18 @@ CREATE TABLE IF NOT EXISTS photos (
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ----------------------------------------------------------------
+-- 1.10  push_subscriptions  (Web Push — background notifications)
+-- ----------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id           UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
+  love_code    TEXT        NOT NULL,
+  user_name    TEXT        NOT NULL,
+  subscription JSONB       NOT NULL,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (love_code, user_name)
+);
+
 
 -- ================================================================
 -- SECTION 2 — ROW LEVEL SECURITY (RLS)
@@ -153,6 +165,7 @@ ALTER TABLE scheduled_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE love_places      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wish_items       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photos           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- ---- couples ----
 DROP POLICY IF EXISTS "Anyone can read couples by code"  ON couples;
@@ -239,6 +252,19 @@ CREATE POLICY "Anyone can insert photos" ON photos FOR INSERT WITH CHECK (true);
 CREATE POLICY "Anyone can read photos"   ON photos FOR SELECT USING (true);
 CREATE POLICY "Anyone can delete photos" ON photos FOR DELETE USING (true);
 
+-- ---- push_subscriptions ----
+DROP POLICY IF EXISTS "Anyone can upsert push_subscriptions" ON push_subscriptions;
+DROP POLICY IF EXISTS "Anyone can read push_subscriptions"   ON push_subscriptions;
+DROP POLICY IF EXISTS "Anyone can delete push_subscriptions" ON push_subscriptions;
+
+CREATE POLICY "Anyone can upsert push_subscriptions" ON push_subscriptions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can read push_subscriptions"   ON push_subscriptions FOR SELECT USING (true);
+CREATE POLICY "Anyone can delete push_subscriptions" ON push_subscriptions FOR DELETE USING (true);
+
+-- UPDATE needed for upsert (ON CONFLICT DO UPDATE)
+DROP POLICY IF EXISTS "Anyone can update push_subscriptions" ON push_subscriptions;
+CREATE POLICY "Anyone can update push_subscriptions" ON push_subscriptions FOR UPDATE USING (true);
+
 
 -- ================================================================
 -- SECTION 3 — GRANTS (anon + authenticated)
@@ -253,6 +279,7 @@ GRANT SELECT, INSERT, UPDATE           ON scheduled_messages TO anon, authentica
 GRANT SELECT, INSERT, DELETE           ON love_places       TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE   ON wish_items        TO anon, authenticated;
 GRANT SELECT, INSERT, DELETE           ON photos            TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE   ON push_subscriptions TO anon, authenticated;
 
 
 -- ================================================================

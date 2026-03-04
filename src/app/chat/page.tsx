@@ -18,6 +18,7 @@ import { supabase } from "@/lib/supabase";
 import { useStore } from "@/store/useStore";
 import { extractStoragePath } from "@/lib/utils";
 import { resizeImage } from "@/lib/imageUtils";
+import { sendPushToPartner } from "@/lib/pushUtils";
 import dayjs from "dayjs";
 import Toast from "@/components/ui/Toast";
 import { useToast } from "@/hooks/useToast";
@@ -427,6 +428,19 @@ export default function ChatPage() {
       } else if (data) {
         // Optimistic update: Thêm tin nhắn ngay vào UI
         setMessages((prev) => [...prev, data as Message]);
+        // Gửi Web Push nền cho người nhận (kể cả khi app đóng)
+        if (partner?.name) {
+          const pushBody = textToSend
+            ? textToSend.slice(0, 80)
+            : "📷 Đã gửi một ảnh";
+          sendPushToPartner(
+            loveCode!,
+            user!.name,
+            `💬 ${user!.name}`,
+            pushBody,
+            "/chat",
+          );
+        }
       }
     } catch (err) {
       showToast("Không gửi được tin nhắn", "error");
