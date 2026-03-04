@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
 import { supabase } from "@/lib/supabase";
@@ -16,7 +16,6 @@ import {
   BellOff,
   Unlink,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { useConfirm } from "@/hooks/useConfirm";
 import Toast from "@/components/ui/Toast";
 import { useToast } from "@/hooks/useToast";
@@ -59,9 +58,10 @@ export default function SettingsPage() {
   useEffect(() => {
     if (typeof Notification !== "undefined") {
       setNotifPermission(Notification.permission);
-      // Tự động đăng ký push subscription nếu đã có quyền
+      // Delay để không block paint đầu tiên của trang
       if (Notification.permission === "granted" && loveCode && user?.name) {
-        subscribeToPush(loveCode, user.name);
+        const t = setTimeout(() => subscribeToPush(loveCode, user.name), 300);
+        return () => clearTimeout(t);
       }
     } else {
       setNotifPermission("unsupported");
@@ -95,40 +95,26 @@ export default function SettingsPage() {
     }
   };
 
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    avatar: user?.avatar || "",
-    partnerName: partner?.name || "",
-    partnerAvatar: partner?.avatar || "",
-    startDate: startDate || "",
-    myBirthdate: myBirthdate || "",
-    partnerBirthdate: partnerBirthdate || "",
-    myGender: myGender || "",
-    partnerGender: partnerGender || "",
-  });
+  const buildFormData = useCallback(() => ({
+    name: user?.name ?? "",
+    avatar: user?.avatar ?? "",
+    partnerName: partner?.name ?? "",
+    partnerAvatar: partner?.avatar ?? "",
+    startDate: getFormattedDate(startDate),
+    myBirthdate: getFormattedDate(myBirthdate),
+    partnerBirthdate: getFormattedDate(partnerBirthdate),
+    myGender: myGender ?? "",
+    partnerGender: partnerGender ?? "",
+  }), [user, partner, startDate, myBirthdate, partnerBirthdate, myGender, partnerGender]);
 
+  const [formData, setFormData] = useState(buildFormData);
+
+  // Đồng bộ nếu store thay đổi từ bên ngoài (ví dụ realtime cập nhật partner)
+  const isFirstMount = useRef(true);
   useEffect(() => {
-    // Reset form data if store updates
-    setFormData({
-      name: user?.name || "",
-      avatar: user?.avatar || "",
-      partnerName: partner?.name || "",
-      partnerAvatar: partner?.avatar || "",
-      startDate: getFormattedDate(startDate),
-      myBirthdate: getFormattedDate(myBirthdate),
-      partnerBirthdate: getFormattedDate(partnerBirthdate),
-      myGender: myGender || "",
-      partnerGender: partnerGender || "",
-    });
-  }, [
-    user,
-    partner,
-    startDate,
-    myBirthdate,
-    partnerBirthdate,
-    myGender,
-    partnerGender,
-  ]);
+    if (isFirstMount.current) { isFirstMount.current = false; return; }
+    setFormData(buildFormData());
+  }, [buildFormData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -326,7 +312,7 @@ export default function SettingsPage() {
         {/* Header */}
         <section className="sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-rose-100/40 px-5 safe-pt pb-4 flex items-center justify-between">
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.back()}
             className="w-10 h-10 flex items-center justify-center bg-rose-50 rounded-2xl border border-rose-100 text-rose-400 active:scale-90 transition-transform"
           >
             <ArrowLeft className="w-5 h-5" />
