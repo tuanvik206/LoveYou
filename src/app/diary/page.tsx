@@ -145,7 +145,7 @@ export default function DiaryPage() {
         .from("diary_entries")
         .insert({
           code: loveCode,
-          content: newContent.trim() || null,
+          content: newContent.trim(),
           author: user.name,
           image_url: imageUrl,
         })

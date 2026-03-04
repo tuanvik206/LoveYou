@@ -8,9 +8,11 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!,
 );
 
+// Dùng service_role key để bypass RLS — đây là server-side route, an toàn
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
 );
 
 // In-memory subscription cache (per serverless instance, TTL 10 min)
@@ -42,6 +44,15 @@ function invalidateCache(love_code: string) {
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth guard: verify internal secret để tránh spam từ bên ngoài
+    const pushSecret = process.env.PUSH_SECRET;
+    if (pushSecret) {
+      const reqSecret = req.headers.get("x-push-secret");
+      if (reqSecret !== pushSecret) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     const { love_code, sender_name, title, body, url } = await req.json();
 
     if (!love_code || !sender_name || !title) {

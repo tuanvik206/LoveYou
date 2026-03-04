@@ -113,7 +113,12 @@ export async function sendPushToPartner(
     // keepalive: true — request hoàn thành ngay cả khi navigate sang trang khác
     fetch("/api/send-push", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.NEXT_PUBLIC_PUSH_SECRET
+          ? { "x-push-secret": process.env.NEXT_PUBLIC_PUSH_SECRET }
+          : {}),
+      },
       keepalive: true,
       body: JSON.stringify({
         love_code: loveCode,

@@ -72,7 +72,7 @@ export const useStore = create<AppState>()(
     }),
     {
       name: "loveyou-storage",
-      version: 2,
+      version: 3,
       // isPartnerOnline là runtime state, không lưu localStorage
       partialize: (state) => ({
         user: state.user,
@@ -85,6 +85,24 @@ export const useStore = create<AppState>()(
         myGender: state.myGender,
         partnerGender: state.partnerGender,
       }),
+      // Khi schema thay đổi, migrate về state mặc định để tránh crash với data cũ
+      migrate: (_persistedState, fromVersion) => {
+        // version < 3: reset toàn bộ — user sẽ cần đăng nhập lại từ Supabase
+        if (fromVersion < 3) {
+          return {
+            user: null,
+            partner: null,
+            role: null,
+            loveCode: null,
+            startDate: null,
+            myBirthdate: null,
+            partnerBirthdate: null,
+            myGender: null,
+            partnerGender: null,
+          };
+        }
+        return _persistedState as AppState;
+      },
     },
   ),
 );
