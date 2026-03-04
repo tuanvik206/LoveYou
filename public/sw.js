@@ -1,4 +1,4 @@
-const CACHE_NAME = "loveyou-v3";
+const CACHE_NAME = "loveyou-v4";
 const IMAGE_CACHE = "loveyou-images-v2";
 
 // Các asset tĩnh cần cache để dùng offline
@@ -20,7 +20,7 @@ self.addEventListener("activate", (e) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => !["loveyou-v3", "loveyou-images-v2"].includes(key))
+            .filter((key) => !["loveyou-v4", "loveyou-images-v2"].includes(key))
             .map((key) => caches.delete(key)),
         ),
       ),

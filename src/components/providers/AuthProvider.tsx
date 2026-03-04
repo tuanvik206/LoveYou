@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "@/store/useStore";
+import { subscribeToPush } from "@/lib/pushUtils";
 
 const PUBLIC_ROUTES = ["/auth/login", "/auth/register"];
 
@@ -193,6 +194,15 @@ export default function AuthProvider({
     checkAuthStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-subscribe Web Push khi user đã đăng nhập và đã có quyền thông báo
+  useEffect(() => {
+    if (!user?.name || !loveCode || isLoading) return;
+    if (typeof Notification === "undefined") return;
+    if (Notification.permission !== "granted") return;
+    // Chạy ngầm — nếu đã subscribe rồi thì upsert không gây hại gì
+    subscribeToPush(loveCode, user.name);
+  }, [user?.name, loveCode, isLoading]);
 
   // Global presence: 1 channel duy nhất — track bản thân + lắng nghe partner
   useEffect(() => {

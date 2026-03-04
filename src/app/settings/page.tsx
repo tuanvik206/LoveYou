@@ -58,6 +58,10 @@ export default function SettingsPage() {
   useEffect(() => {
     if (typeof Notification !== "undefined") {
       setNotifPermission(Notification.permission);
+      // Tự động đăng ký push subscription nếu đã có quyền
+      if (Notification.permission === "granted" && loveCode && user?.name) {
+        subscribeToPush(loveCode, user.name);
+      }
     } else {
       setNotifPermission("unsupported");
     }
