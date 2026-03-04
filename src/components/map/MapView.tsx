@@ -29,15 +29,16 @@ export interface LovePlace {
 }
 
 // Google Maps Satellite Hybrid (Vệ tinh siêu nét + Địa chỉ/Tên đường)
+// Sử dụng scale=2 và tileSize=512 để có độ phân giải Retina (cực nét cho chữ)
 const MAP_STYLE_SATELLITE = {
   version: 8 as const,
   sources: {
     "google-hybrid": {
       type: "raster" as const,
       tiles: [
-        "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}"
+        "https://mt1.google.com/vt/lyrs=y&hl=vi&x={x}&y={y}&z={z}&scale=2"
       ],
-      tileSize: 256,
+      tileSize: 512,
       attribution: "Map data © Google",
       maxzoom: 21,
     },
