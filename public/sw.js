@@ -1,4 +1,4 @@
-const CACHE_NAME = "loveyou-v4";
+const CACHE_NAME = "loveyou-v5";
 const IMAGE_CACHE = "loveyou-images-v2";
 
 // Các asset tĩnh cần cache để dùng offline
@@ -20,7 +20,7 @@ self.addEventListener("activate", (e) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => !["loveyou-v4", "loveyou-images-v2"].includes(key))
+            .filter((key) => !["loveyou-v5", "loveyou-images-v2"].includes(key))
             .map((key) => caches.delete(key)),
         ),
       ),
@@ -133,13 +133,23 @@ self.addEventListener("fetch", (e) => {
 // === Push notifications ===
 self.addEventListener("push", (e) => {
   const data = e.data?.json() ?? {};
+
   e.waitUntil(
-    self.registration.showNotification(data.title || "LoveYou 💕", {
-      body: data.body || "",
-      icon: "/icon-192x192.png",
-      badge: "/icon-192x192.png",
-      data: { url: data.url || "/" },
-    }),
+    // Nếu app đang mở và focused → không hiện notification
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windowClients) => {
+        const appFocused = windowClients.some((c) => c.focused);
+        if (appFocused) return; // Người dùng đang nhìn vào app → bỏ qua
+
+        return self.registration.showNotification(data.title || "LoveYou 💕", {
+          body: data.body || "",
+          icon: "/icon-192x192.png",
+          badge: "/icon-192x192.png",
+          vibrate: [200, 100, 200],
+          data: { url: data.url || "/" },
+        });
+      }),
   );
 });
 
