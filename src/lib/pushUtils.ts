@@ -39,6 +39,50 @@ export async function subscribeToPush(
   }
 }
 
+/**
+ * Refresh subscription silently mỗi lần app mở.
+ * Không hỏi quyền — chỉ chạy khi đã có quyền.
+ * Đảm bảo DB luôn lưu endpoint mới nhất (tránh subscription hết hạn).
+ */
+export async function refreshPushSubscription(
+  loveCode: string,
+  userName: string,
+): Promise<void> {
+  try {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    if (typeof Notification === "undefined") return;
+    if (Notification.permission !== "granted") return;
+
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+
+    // Nếu không có (bị browser xóa) → tạo mới
+    if (!sub) {
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          vapidPublicKey,
+        ) as unknown as ArrayBuffer,
+      });
+    }
+
+    // Luôn upsert để DB có endpoint mới nhất
+    await supabase
+      .from("push_subscriptions")
+      .upsert(
+        {
+          love_code: loveCode,
+          user_name: userName,
+          subscription: sub.toJSON(),
+        },
+        { onConflict: "love_code,user_name" },
+      );
+  } catch {
+    // silent
+  }
+}
+
 export async function unsubscribeFromPush(
   loveCode: string,
   userName: string,

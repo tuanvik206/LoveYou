@@ -1,10 +1,8 @@
-const CACHE_NAME = "loveyou-v5";
+const CACHE_NAME = "loveyou-v6";
 const IMAGE_CACHE = "loveyou-images-v2";
 
-// Các asset tĩnh cần cache để dùng offline
 const STATIC_ASSETS = ["/", "/manifest.json", "/offline.html"];
 
-// === Install: cache static assets ===
 self.addEventListener("install", (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)),
@@ -12,7 +10,6 @@ self.addEventListener("install", (e) => {
   self.skipWaiting();
 });
 
-// === Activate: dọn cache cũ ===
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches
@@ -20,7 +17,7 @@ self.addEventListener("activate", (e) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => !["loveyou-v5", "loveyou-images-v2"].includes(key))
+            .filter((key) => !["loveyou-v6", "loveyou-images-v2"].includes(key))
             .map((key) => caches.delete(key)),
         ),
       ),
@@ -132,24 +129,43 @@ self.addEventListener("fetch", (e) => {
 
 // === Push notifications ===
 self.addEventListener("push", (e) => {
-  const data = e.data?.json() ?? {};
+  let data = {};
+  try {
+    data = e.data?.json() ?? {};
+  } catch {
+    data = { title: "LoveYou 💕" };
+  }
 
   e.waitUntil(
-    // Nếu app đang mở và focused → không hiện notification
     clients
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((windowClients) => {
-        const appFocused = windowClients.some((c) => c.focused);
-        if (appFocused) return; // Người dùng đang nhìn vào app → bỏ qua
+        // Chỉ bỏ qua nếu đang visible (focused)
+        const appVisible = windowClients.some(
+          (c) => c.visibilityState === "visible",
+        );
+        if (appVisible) return;
 
         return self.registration.showNotification(data.title || "LoveYou 💕", {
           body: data.body || "",
           icon: "/icon-192x192.png",
           badge: "/icon-192x192.png",
-          vibrate: [200, 100, 200],
+          vibrate: [200, 100, 200, 100, 200],
+          tag: data.tag || "loveyou-msg",
+          renotify: true,
           data: { url: data.url || "/" },
         });
-      }),
+      })
+      .catch(() =>
+        // Nếu matchAll lỗi → hiện luôn
+        self.registration.showNotification(data.title || "LoveYou 💕", {
+          body: data.body || "",
+          icon: "/icon-192x192.png",
+          badge: "/icon-192x192.png",
+          vibrate: [200, 100, 200],
+          data: { url: data.url || "/" },
+        }),
+      ),
   );
 });
 
