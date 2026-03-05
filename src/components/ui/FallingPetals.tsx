@@ -115,7 +115,7 @@ function Petal({ color, size }: { color: string; size: number }) {
   );
 }
 
-const COUNT = 38;
+const COUNT = 18; // Reduced from 38 to improve rendering performance and reduce lag
 
 // Pre-compute configs once — tránh re-generate mỗi render
 // Dùng negative delay phân phối theo index → đảm bảo mỗi cánh ở pha khác nhau,

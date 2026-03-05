@@ -296,7 +296,10 @@ export default function Home() {
 
   // Thinking-of-you nudge
   const userNameRef = useRef<string | null>(null);
-  userNameRef.current = user?.name ?? null;
+  useEffect(() => {
+    userNameRef.current = user?.name ?? null;
+  }, [user?.name]);
+  
   const [nudgeSending, setNudgeSending] = useState(false);
   const [nudgeSent, setNudgeSent] = useState(false);
   const [partnerNudgeAt, setPartnerNudgeAt] = useState<string | null>(null);
@@ -490,7 +493,7 @@ export default function Home() {
       if (nudgeBannerTimerRef.current)
         clearTimeout(nudgeBannerTimerRef.current);
     };
-  }, [isMounted, loveCode, role, showNotification]);
+  }, [isMounted, loveCode, role, showNotification, setPartner, setStartDate, setUser]);
 
   // Tự động cập nhật bộ đếm ngày khi qua nửa đêm
   useEffect(() => {
@@ -554,7 +557,7 @@ export default function Home() {
     setTimeout(() => setNudgeSent(false), 3000);
   };
 
-  const handleEmojiSelect = async (emojiData: any) => {
+  const handleEmojiSelect = async (emojiData: { emoji: string }) => {
     const customMood = {
       emoji: emojiData.emoji,
       label: emojiData.emoji, // Dùng emoji làm label luôn
@@ -577,7 +580,7 @@ export default function Home() {
   if (!isMounted || !user || !partner) return null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50/60 to-purple-50/40 pb-32 overflow-x-hidden">
+    <main className="min-h-[100dvh] bg-gradient-to-br from-rose-50 via-pink-50/60 to-purple-50/40 pb-32 overflow-x-hidden">
       {/* Header / Avatars */}
       <section
         className="relative w-full px-3 sm:px-4 md:px-8 pt-4 pb-8 overflow-hidden"
@@ -603,7 +606,13 @@ export default function Home() {
         <div className="flex items-start justify-between relative z-10 max-w-2xl mx-auto mt-2">
           {/* My avatar */}
           <motion.div
-            initial={false}
+            initial={{ y: 0 }}
+            animate={{ y: [-3, 3, -3] }}
+            transition={{
+              repeat: Infinity,
+              duration: 5,
+              ease: "easeInOut",
+            }}
             className="flex flex-col items-center gap-0.5 w-[30%]"
           >
             <div className="relative">
@@ -709,7 +718,14 @@ export default function Home() {
 
           {/* Partner avatar */}
           <motion.div
-            initial={false}
+            initial={{ y: 0 }}
+            animate={{ y: [3, -3, 3] }}
+            transition={{
+              repeat: Infinity,
+              duration: 4.5,
+              ease: "easeInOut",
+              delay: 0.5,
+            }}
             className="flex flex-col items-center gap-0.5 w-[30%]"
           >
             <div className="relative">

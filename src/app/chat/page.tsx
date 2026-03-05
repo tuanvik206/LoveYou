@@ -76,8 +76,8 @@ export default function ChatPage() {
     [messages],
   );
 
-  const URL_RE = /(https?:\/\/[^\s]+)/g;
   const sharedLinks = useMemo(() => {
+    const URL_RE = /(https?:\/\/[^\s]+)/g;
     const links: { url: string; sender: string; date: string }[] = [];
     for (const m of messages) {
       if (!m.text) continue;
@@ -271,7 +271,7 @@ export default function ChatPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [isMounted, loveCode]);
+  }, [isMounted, loveCode, user]);
 
   const loadMoreMessages = async () => {
     if (!loveCode || messages.length === 0) return;

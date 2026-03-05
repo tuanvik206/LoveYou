@@ -21,10 +21,10 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "react-image-gallery": "^2.1.2",
     "react-map-gl": "^8.1.0",
     "tailwind-merge": "^3.5.0",
     "web-push": "^3.6.7",
+    "yet-another-react-lightbox": "^3.29.1",
     "zustand": "^5.0.11"
   },
   "devDependencies": {

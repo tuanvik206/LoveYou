@@ -45,7 +45,6 @@ export default function BottomNav() {
             <Link
               key={item.path}
               href={item.path}
-              prefetch={true}
               className="relative flex flex-col items-center gap-0.5 outline-none select-none"
               style={{ minWidth: 44 }}
             >

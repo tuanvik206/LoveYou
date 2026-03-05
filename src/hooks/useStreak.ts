@@ -11,8 +11,10 @@ export function useStreak(
   const [sharedStreak, setSharedStreak] = useState(0);
   // Giữ tham số ổn định trong ref để dùng bên trong callback
   const paramsRef = useRef({ loveCode, userName, partnerName });
-  paramsRef.current = { loveCode, userName, partnerName };
 
+  useEffect(() => {
+    paramsRef.current = { loveCode, userName, partnerName };
+  }, [loveCode, userName, partnerName]);
   const fetchSharedStreak = useCallback(async (): Promise<number> => {
     const { loveCode, userName, partnerName } = paramsRef.current;
     if (!loveCode || !userName || !partnerName) return 0;

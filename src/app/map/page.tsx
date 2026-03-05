@@ -78,7 +78,7 @@ async function nominatimSearch(
     );
     if (!res.ok) return [];
     const data = await res.json();
-    return data.map((d: any) => ({
+    return data.map((d: { lat: string; lon: string; display_name: string }) => ({
       lat: parseFloat(d.lat),
       lng: parseFloat(d.lon),
       label: d.display_name,
@@ -193,9 +193,16 @@ export default function MapPage() {
   // Battery API
   useEffect(() => {
     if (!isMounted) return;
-    const nav = navigator as any;
-    if (!("getBattery" in nav)) return;
-    let bm: any = null;
+    const nav = navigator as Navigator & {
+      getBattery?: () => Promise<{
+        level: number;
+        charging: boolean;
+        addEventListener: (event: string, cb: () => void) => void;
+        removeEventListener: (event: string, cb: () => void) => void;
+      }>;
+    };
+    if (!("getBattery" in nav) || !nav.getBattery) return;
+    let bm: Awaited<ReturnType<NonNullable<typeof nav.getBattery>>> | null = null;
     const update = () => {
       if (!bm) return;
       const info: BatteryInfo = {
@@ -205,7 +212,7 @@ export default function MapPage() {
       setMyBattery(info);
       myBatteryRef.current = info;
     };
-    nav.getBattery().then((battery: any) => {
+    nav.getBattery().then((battery) => {
       bm = battery;
       update();
       battery.addEventListener("levelchange", update);
@@ -291,14 +298,23 @@ export default function MapPage() {
           filter: `code=eq.${loveCode}`,
         },
         (payload) => {
-          const r = payload.new as any;
+          const r = payload.new as {
+            user1_lat?: number;
+            user1_lng?: number;
+            user2_lat?: number;
+            user2_lng?: number;
+            user1_battery?: number;
+            user1_charging?: boolean;
+            user2_battery?: number;
+            user2_charging?: boolean;
+          };
           if (!r) return;
           if (role === "user1") {
-            if (r.user2_lat)
+            if (r.user2_lat != null && r.user2_lng != null)
               setPartnerLoc((prev) =>
                 prev && prev.lat === r.user2_lat && prev.lng === r.user2_lng
                   ? prev
-                  : { lat: r.user2_lat, lng: r.user2_lng },
+                  : { lat: r.user2_lat!, lng: r.user2_lng! },
               );
             if (r.user2_battery != null)
               setPartnerBattery({
@@ -306,11 +322,11 @@ export default function MapPage() {
                 charging: r.user2_charging ?? false,
               });
           } else {
-            if (r.user1_lat)
+            if (r.user1_lat != null && r.user1_lng != null)
               setPartnerLoc((prev) =>
                 prev && prev.lat === r.user1_lat && prev.lng === r.user1_lng
                   ? prev
-                  : { lat: r.user1_lat, lng: r.user1_lng },
+                  : { lat: r.user1_lat!, lng: r.user1_lng! },
               );
             if (r.user1_battery != null)
               setPartnerBattery({
@@ -548,7 +564,10 @@ export default function MapPage() {
 
   // Track map center for pin placement
   const handleCenterChange = useCallback((lat: number, lng: number) => {
-    currentMapCenterRef.current = { lat, lng };
+    if (centerDebounceRef.current) clearTimeout(centerDebounceRef.current);
+    centerDebounceRef.current = setTimeout(() => {
+      currentMapCenterRef.current = { lat, lng };
+    }, 150);
   }, []);
 
   const handlePin = useCallback(

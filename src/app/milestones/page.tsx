@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
 import { ArrowLeft, CheckCircle2, CalendarHeart } from "lucide-react";
@@ -10,17 +10,22 @@ import { ALL_MILESTONES } from "@/constants/milestones";
 export default function MilestonesPage() {
   const router = useRouter();
   const { startDate } = useStore();
-  const [currentDays, setCurrentDays] = useState(0);
   const [exactTime, setExactTime] = useState({ years: 0, months: 0, days: 0 });
+
+  // Compute derived state instead of setting it in useEffect
+  const currentDays = useMemo(() => {
+    if (!startDate) return 0;
+    const start = new Date(startDate);
+    const diff = Math.floor(
+      (new Date().getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    return diff >= 0 ? diff : 0;
+  }, [startDate]);
 
   useEffect(() => {
     if (startDate) {
       const start = new Date(startDate);
       const now = new Date();
-      const diff = Math.floor(
-        (now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
-      );
-      setCurrentDays(diff >= 0 ? diff : 0);
 
       let y = now.getFullYear() - start.getFullYear();
       let m = now.getMonth() - start.getMonth();

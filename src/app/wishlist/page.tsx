@@ -96,10 +96,6 @@ export default function WishlistPage() {
 
   useEffect(() => {
     if (showModal) setTimeout(() => titleInputRef.current?.focus(), 100);
-    else {
-      setNewTitle("");
-      setNewEmoji("🌟");
-    }
   }, [showModal]);
 
   const handleAdd = async () => {
@@ -185,7 +181,11 @@ export default function WishlistPage() {
               </p>
             </div>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => {
+                setNewTitle("");
+                setNewEmoji("🌟");
+                setShowModal(true);
+              }}
               className="h-9 px-4 rounded-2xl bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-rose-200 active:scale-95 transition-transform"
             >
               <Plus className="w-3.5 h-3.5" /> Thêm

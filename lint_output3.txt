@@ -1,0 +1,146 @@
+﻿
+> app@0.1.0 lint
+> eslint
+
+
+C:\Users\tuanv\Desktop\LoveYou\_rewritemap.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Users\tuanv\Desktop\LoveYou\_writemap.js
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\api\cron\goodnight\route.ts
+   74:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\api\send-push\route.ts
+  20:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\auth\login\page.tsx
+  21:15  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  35:19  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\auth\register\page.tsx
+  48:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\chat\page.tsx
+    91:6   warning  React Hook useMemo has a missing dependency: 'URL_RE'. Either include it or remove the dependency array                                                                                                                                                                                  react-hooks/exhaustive-deps
+   274:6   warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array                                                                                                                                                                                  react-hooks/exhaustive-deps
+   475:14  warning  'err' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   526:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   665:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   689:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   765:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+   832:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  1013:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\diary\page.tsx
+   29:9   warning  'router' is assigned a value but never used                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   96:6   warning  React Hook useEffect has a missing dependency: 'user?.name'. Either include it or remove the dependency array                                                                                                                                                                            react-hooks/exhaustive-deps
+  377:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\map\page.tsx
+   81:25  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  184:9   warning  'centerDebounceRef' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  196:30  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  198:13  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  208:37  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  294:36  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  349:34  error    Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\milestones\page.tsx
+  45:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\milestones\page.tsx:45:7
+  43 |       }
+  44 |
+> 45 |       setExactTime({
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  46 |         years: Math.max(0, y),
+  47 |         months: Math.max(0, m),
+  48 |         days: Math.max(0, d),  react-hooks/set-state-in-effect
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\onboarding\page.tsx
+   77:46  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+   93:6   warning  React Hook useEffect has a missing dependency: 'setPartnerBirthdate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  142:14  warning  'err' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+  224:14  warning  'err' is defined but never used                                                                                         @typescript-eslint/no-unused-vars
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\page.tsx
+    4:40  warning  'useCallback' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  299:3   error    Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\page.tsx:299:3
+  297 |   // Thinking-of-you nudge
+  298 |   const userNameRef = useRef<string | null>(null);
+> 299 |   userNameRef.current = user?.name ?? null;
+      |   ^^^^^^^^^^^^^^^^^^^ Cannot update ref during render
+  300 |   const [nudgeSending, setNudgeSending] = useState(false);
+  301 |   const [nudgeSent, setNudgeSent] = useState(false);
+  302 |   const [partnerNudgeAt, setPartnerNudgeAt] = useState<string | null>(null);  react-hooks/refs
+  441:44  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+  493:6   warning  React Hook useEffect has missing dependencies: 'setPartner', 'setStartDate', and 'setUser'. Either include them or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-hooks/exhaustive-deps
+  522:9   warning  'handleMoodChange' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  557:47  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-explicit-any
+  618:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @next/next/no-img-element
+  731:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @next/next/no-img-element
+  888:15  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react/no-unescaped-entities
+  888:31  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react/no-unescaped-entities
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\photos\page.tsx
+   93:6   warning  React Hook useEffect has a missing dependency: 'user?.name'. Either include it or remove the dependency array                                                                                                                                                                            react-hooks/exhaustive-deps
+  185:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  356:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  470:9   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\settings\page.tsx
+   69:6   warning  React Hook useEffect has missing dependencies: 'loveCode' and 'user.name'. Either include them or remove the dependency array                                                                                                                                                            react-hooks/exhaustive-deps
+  256:25  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  302:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  389:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  503:27  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\wishlist\page.tsx
+  59:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\tuanv\Desktop\LoveYou\src\app\wishlist\page.tsx:59:5
+  57 |
+  58 |   useEffect(() => {
+> 59 |     setIsMounted(true);
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  60 |   }, []);
+  61 |
+  62 |   useEffect(() => {  react-hooks/set-state-in-effect
+
+C:\Users\tuanv\Desktop\LoveYou\src\components\map\MapView.tsx
+  189:7   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  201:22  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  328:6   warning  React Hook useEffect has a missing dependency: 'flyTarget'. Either include it or remove the dependency array                                                                                                                                                                             react-hooks/exhaustive-deps
+  385:40  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\Users\tuanv\Desktop\LoveYou\src\components\providers\AuthProvider.tsx
+    7:10  warning  'subscribeToPush' is defined but never used                                                     @typescript-eslint/no-unused-vars
+  146:5   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+  222:21  error    Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  226:30  error    Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  226:46  error    Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  232:29  error    Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+  232:45  error    Unexpected any. Specify a different type                                                        @typescript-eslint/no-explicit-any
+
+Γ£û 63 problems (30 errors, 33 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

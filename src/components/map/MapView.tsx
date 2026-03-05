@@ -311,7 +311,10 @@ const MapView = memo(function MapView({
   const mapRef = useRef<MapRef>(null);
 
   const flyTargetRef = useRef(flyTarget);
-  flyTargetRef.current = flyTarget;
+
+  useEffect(() => {
+    flyTargetRef.current = flyTarget;
+  }, [flyTarget]);
 
   useEffect(() => {
     if (!flyTarget || !mapRef.current) return;
