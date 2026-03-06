@@ -36,7 +36,6 @@ export default function CycleCalendar({
   setCurrentDate,
   cycles,
   onLogStart,
-  onLogStart,
   onLogEnd,
   confirm,
   showToast,
