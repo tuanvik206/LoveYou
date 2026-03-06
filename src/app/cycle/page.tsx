@@ -11,6 +11,9 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import dynamic from "next/dynamic";
 import type { CycleRecord } from "@/components/cycle/CycleCalendar";
 import { AnimatePresence, motion } from "framer-motion";
+import { useConfirm } from "@/hooks/useConfirm";
+import { useToast } from "@/hooks/useToast";
+import Toast from "@/components/ui/Toast";
 
 dayjs.extend(isBetween);
 dayjs.extend(isSameOrAfter);
@@ -28,6 +31,8 @@ export default function CyclePage() {
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(dayjs());
   const [showCalendar, setShowCalendar] = useState(false);
+  const { confirm, ConfirmNode } = useConfirm();
+  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     setIsMounted(true);
@@ -354,11 +359,15 @@ export default function CyclePage() {
               cycles={cycles}
               onLogStart={handleLogStart}
               onLogEnd={handleLogEnd}
+              confirm={confirm}
+              showToast={showToast}
             />
           )}
         </div>
 
       </div>
+      {ConfirmNode}
+      <Toast toast={toast} onClose={hideToast} />
     </main>
   );
 }

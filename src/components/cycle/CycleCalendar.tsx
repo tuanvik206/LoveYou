@@ -25,6 +25,8 @@ interface CycleCalendarProps {
   cycles: CycleRecord[];
   onLogStart: (date: string) => void;
   onLogEnd: (cycleId: string, date: string) => void;
+  confirm: (options: any) => void;
+  showToast: (message: string, type: any) => void;
 }
 
 const DAYS_OF_WEEK = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -34,10 +36,11 @@ export default function CycleCalendar({
   setCurrentDate,
   cycles,
   onLogStart,
+  onLogStart,
   onLogEnd,
+  confirm,
+  showToast,
 }: CycleCalendarProps) {
-  const { confirm, ConfirmNode } = useConfirm();
-  const { toast, showToast, hideToast } = useToast();
   const daysInMonth = currentDate.daysInMonth();
   const firstDayOfMonth = currentDate.startOf("month").day(); // 0 is Sunday
   
@@ -244,8 +247,6 @@ export default function CycleCalendar({
           <div className="w-4 h-4 rounded-full bg-purple-500 shadow-sm" /> Rụng trứng
         </div>
       </div>
-      {ConfirmNode}
-      <Toast toast={toast} onClose={hideToast} />
     </div>
   );
 }
