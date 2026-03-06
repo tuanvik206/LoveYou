@@ -255,21 +255,22 @@ export default function CyclePage() {
     <main className="min-h-[100dvh] bg-[#fdfbfb] pb-32">
       {/* Sticky Header with Weekly Strip */}
       <header
-        className="sticky top-0 z-30 bg-white/95 backdrop-blur-2xl border-b border-rose-100/50 pb-3 shadow-sm"
+        className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-rose-100/50 pb-3"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 12px)" }}
       >
-        <div className="flex items-center justify-between px-5 mb-4">
+        <div className="flex items-center justify-between px-5 mb-3">
           <div>
-            <h1 className="text-xl font-black text-gray-800 flex items-center gap-1.5 tracking-tight">
-              <Droplet className="w-5 h-5 text-rose-500 shrink-0" fill="currentColor" opacity={0.2} /> Sức khỏe chu kỳ
+            <h1 className="text-lg font-bold text-gray-800 flex items-center gap-1.5">
+              <Droplet className="w-5 h-5 text-rose-500 shrink-0" fill="currentColor" opacity={0.15} /> 
+              Sức khỏe chu kỳ
             </h1>
-            <p className="text-xs text-rose-400/80 font-bold uppercase tracking-wider mt-0.5">
-              Tình trạng ôm ấp
+            <p className="text-[11px] text-gray-400 font-medium mt-0.5">
+              {activeCycle ? "Đang trong kỳ kinh" : "Lưu giữ nhịp đập cơ thể"}
             </p>
           </div>
           <button 
             onClick={() => setShowCalendar(!showCalendar)}
-            className="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 hover:bg-rose-100 transition-colors"
+            className="w-10 h-10 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 hover:bg-rose-100 transition-all shadow-sm active:scale-90"
           >
             <CalendarIcon className="w-5 h-5" />
           </button>

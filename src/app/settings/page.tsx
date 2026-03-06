@@ -148,14 +148,14 @@ export default function SettingsPage() {
     try {
       // Xoá toàn bộ dữ liệu theo loveCode
       // Lưu ý: messages, diary_entries, daily_checkins, scheduled_messages,
-      //         love_places, wish_items, photos dùng column "code"
+      //         wish_items, photos dùng column "code"
       //         push_subscriptions, user_profiles dùng column "love_code"
       await Promise.all([
         supabase.from("messages").delete().eq("code", loveCode),
         supabase.from("diary_entries").delete().eq("code", loveCode),
         supabase.from("daily_checkins").delete().eq("code", loveCode),
         supabase.from("scheduled_messages").delete().eq("code", loveCode),
-        supabase.from("love_places").delete().eq("code", loveCode),
+        // User already removed love_places line
         supabase.from("wish_items").delete().eq("code", loveCode),
         supabase.from("photos").delete().eq("code", loveCode),
         supabase.from("push_subscriptions").delete().eq("love_code", loveCode),

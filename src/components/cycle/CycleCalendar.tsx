@@ -4,7 +4,10 @@ import { useMemo } from "react";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import { ChevronLeft, ChevronRight, Droplet } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";import { useConfirm } from "@/hooks/useConfirm";
+import { motion, AnimatePresence } from "framer-motion";
+import { useConfirm } from "@/hooks/useConfirm";
+import { useToast } from "@/hooks/useToast";
+import Toast from "@/components/ui/Toast";
 
 dayjs.extend(isBetween);
 
@@ -34,6 +37,7 @@ export default function CycleCalendar({
   onLogEnd,
 }: CycleCalendarProps) {
   const { confirm, ConfirmNode } = useConfirm();
+  const { toast, showToast, hideToast } = useToast();
   const daysInMonth = currentDate.daysInMonth();
   const firstDayOfMonth = currentDate.startOf("month").day(); // 0 is Sunday
   
@@ -120,7 +124,7 @@ export default function CycleCalendar({
     } else if (state.type !== "period") {
       const hasActive = cycles.some(c => !c.end_date);
       if (hasActive) {
-        alert("Có một chu kỳ đang diễn ra chưa kết thúc.");
+        showToast("Có một chu kỳ đang diễn ra chưa kết thúc.", "error");
         return;
       }
       confirm({
@@ -241,6 +245,7 @@ export default function CycleCalendar({
         </div>
       </div>
       {ConfirmNode}
+      <Toast toast={toast} onClose={hideToast} />
     </div>
   );
 }

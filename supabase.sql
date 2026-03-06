@@ -411,3 +411,4 @@ CREATE POLICY "Auth delete photos-bucket"
 -- 2. Deploy the Next.js app (Vercel recommended)
 -- 3. Set env vars: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 -- ================================================================
+
