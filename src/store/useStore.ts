@@ -87,7 +87,6 @@ export const useStore = create<AppState>()(
       }),
       // Khi schema thay đổi, migrate về state mặc định để tránh crash với data cũ
       migrate: (_persistedState, fromVersion) => {
-        // version < 3: reset toàn bộ — user sẽ cần đăng nhập lại từ Supabase
         if (fromVersion < 3) {
           return {
             user: null,

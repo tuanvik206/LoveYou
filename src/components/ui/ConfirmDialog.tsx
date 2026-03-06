@@ -29,9 +29,9 @@ const VARIANT_STYLES = {
     btn: "bg-amber-500 hover:bg-amber-600 text-white",
   },
   primary: {
-    icon: <AlertTriangle className="w-5 h-5 text-rose-500" />,
+    icon: <div className="w-5 h-5 rounded-full border-[3px] border-rose-400 opacity-80" />,
     iconBg: "bg-rose-50",
-    btn: "bg-rose-500 hover:bg-rose-600 text-white",
+    btn: "bg-gradient-to-tr from-rose-400 to-rose-500 text-white shadow-md shadow-rose-200",
   },
 };
 
@@ -49,7 +49,7 @@ export default function ConfirmDialog({
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-gray-900/15 backdrop-blur-[6px] z-[9999] flex items-center justify-center p-4">
           {/* Backdrop tap to cancel */}
           <div className="absolute inset-0" onClick={onCancel} />
 
@@ -58,7 +58,7 @@ export default function ConfirmDialog({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 10 }}
             transition={{ type: "spring", stiffness: 420, damping: 28 }}
-            className="relative bg-white rounded-3xl w-full max-w-xs shadow-2xl overflow-hidden"
+            className="relative bg-white/95 backdrop-blur-xl rounded-3xl w-full max-w-[280px] shadow-2xl overflow-hidden border border-white/50"
           >
             {/* Body */}
             <div className="p-6 flex flex-col items-center text-center gap-3">

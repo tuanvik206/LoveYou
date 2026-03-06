@@ -26,14 +26,6 @@ CREATE TABLE IF NOT EXISTS couples (
   partner_birthdate DATE,
   my_gender        TEXT        CHECK (my_gender    IN ('male', 'female')),
   partner_gender   TEXT        CHECK (partner_gender IN ('male', 'female')),
-  user1_lat        DOUBLE PRECISION,
-  user1_lng        DOUBLE PRECISION,
-  user2_lat        DOUBLE PRECISION,
-  user2_lng        DOUBLE PRECISION,
-  user1_battery    INTEGER,
-  user1_charging   BOOLEAN     DEFAULT false,
-  user2_battery    INTEGER,
-  user2_charging   BOOLEAN     DEFAULT false,
   last_nudge_at    TIMESTAMPTZ,
   last_nudge_by    TEXT
 );
@@ -100,19 +92,19 @@ CREATE TABLE IF NOT EXISTS scheduled_messages (
 );
 
 -- ----------------------------------------------------------------
--- 1.7  love_places  (love map history)
+-- 1.7  menstrual_cycles  (Chu kỳ kinh nguyệt)
 -- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS love_places (
+CREATE TABLE IF NOT EXISTS menstrual_cycles (
   id           UUID        DEFAULT gen_random_uuid() PRIMARY KEY,
   code         TEXT        NOT NULL,
-  name         TEXT        NOT NULL,
-  note         TEXT,
-  lat          DOUBLE PRECISION NOT NULL,
-  lng          DOUBLE PRECISION NOT NULL,
-  added_by     TEXT        NOT NULL,
-  visited_at   DATE        DEFAULT CURRENT_DATE,
+  start_date   DATE        NOT NULL,
+  end_date     DATE,
+  cycle_length INTEGER     DEFAULT 28,
+  period_length INTEGER    DEFAULT 5,
+  notes        TEXT,
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
+
 
 -- ----------------------------------------------------------------
 -- 1.8  wish_items  (shared wish list)
@@ -162,7 +154,7 @@ ALTER TABLE diary_entries    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_profiles    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_checkins   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE scheduled_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE love_places      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menstrual_cycles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wish_items       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photos           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
@@ -223,14 +215,16 @@ CREATE POLICY "Anyone can insert scheduled" ON scheduled_messages FOR INSERT WIT
 CREATE POLICY "Anyone can read scheduled"   ON scheduled_messages FOR SELECT USING (true);
 CREATE POLICY "Anyone can update scheduled" ON scheduled_messages FOR UPDATE USING (true);
 
--- ---- love_places ----
-DROP POLICY IF EXISTS "Anyone can insert love_places" ON love_places;
-DROP POLICY IF EXISTS "Anyone can read love_places"   ON love_places;
-DROP POLICY IF EXISTS "Anyone can delete love_places" ON love_places;
+-- ---- menstrual_cycles ----
+DROP POLICY IF EXISTS "Anyone can insert menstrual_cycles" ON menstrual_cycles;
+DROP POLICY IF EXISTS "Anyone can read menstrual_cycles"   ON menstrual_cycles;
+DROP POLICY IF EXISTS "Anyone can update menstrual_cycles" ON menstrual_cycles;
+DROP POLICY IF EXISTS "Anyone can delete menstrual_cycles" ON menstrual_cycles;
 
-CREATE POLICY "Anyone can insert love_places" ON love_places FOR INSERT WITH CHECK (true);
-CREATE POLICY "Anyone can read love_places"   ON love_places FOR SELECT USING (true);
-CREATE POLICY "Anyone can delete love_places" ON love_places FOR DELETE USING (true);
+CREATE POLICY "Anyone can insert menstrual_cycles" ON menstrual_cycles FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can read menstrual_cycles"   ON menstrual_cycles FOR SELECT USING (true);
+CREATE POLICY "Anyone can update menstrual_cycles" ON menstrual_cycles FOR UPDATE USING (true);
+CREATE POLICY "Anyone can delete menstrual_cycles" ON menstrual_cycles FOR DELETE USING (true);
 
 -- ---- wish_items ----
 DROP POLICY IF EXISTS "Anyone can insert wish_items" ON wish_items;
@@ -273,11 +267,10 @@ CREATE POLICY "Anyone can update push_subscriptions" ON push_subscriptions FOR U
 
 GRANT SELECT, INSERT, UPDATE           ON couples           TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE   ON messages          TO anon, authenticated;
-GRANT SELECT, INSERT, DELETE           ON diary_entries     TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE           ON user_profiles     TO authenticated;
 GRANT SELECT, INSERT, UPDATE           ON daily_checkins    TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE           ON scheduled_messages TO anon, authenticated;
-GRANT SELECT, INSERT, DELETE           ON love_places       TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE   ON menstrual_cycles  TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE   ON wish_items        TO anon, authenticated;
 GRANT SELECT, INSERT, DELETE           ON photos            TO anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE   ON push_subscriptions TO anon, authenticated;
@@ -290,7 +283,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE   ON push_subscriptions TO anon, authentica
 -- REPLICA IDENTITY FULL — required so Realtime DELETE events carry old record
 ALTER TABLE messages        REPLICA IDENTITY FULL;
 ALTER TABLE diary_entries   REPLICA IDENTITY FULL;
-ALTER TABLE love_places     REPLICA IDENTITY FULL;
+ALTER TABLE menstrual_cycles REPLICA IDENTITY FULL;
 ALTER TABLE photos          REPLICA IDENTITY FULL;
 ALTER TABLE wish_items      REPLICA IDENTITY FULL;
 
@@ -298,7 +291,7 @@ ALTER TABLE wish_items      REPLICA IDENTITY FULL;
 DO $$
 DECLARE
   tables TEXT[] := ARRAY['couples','messages','diary_entries','user_profiles',
-                          'daily_checkins','scheduled_messages','love_places',
+                          'daily_checkins','scheduled_messages','menstrual_cycles',
                           'wish_items','photos'];
   t TEXT;
 BEGIN
@@ -325,7 +318,7 @@ CREATE INDEX IF NOT EXISTS idx_user_profiles_love_code    ON user_profiles   (lo
 CREATE INDEX IF NOT EXISTS idx_daily_checkins_code        ON daily_checkins  (code, checkin_date DESC);
 CREATE INDEX IF NOT EXISTS idx_scheduled_messages_delivery ON scheduled_messages (code, delivered, scheduled_at)
   WHERE delivered = false;
-CREATE INDEX IF NOT EXISTS idx_love_places_code           ON love_places     (code, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_menstrual_cycles_code      ON menstrual_cycles(code, start_date DESC);
 CREATE INDEX IF NOT EXISTS idx_wish_items_code            ON wish_items      (code, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_photos_code                ON photos          (code, created_at DESC);
 

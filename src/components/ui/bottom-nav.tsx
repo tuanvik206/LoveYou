@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Heart,
-  MapPin,
+  Droplet,
   BookHeart,
   MessageCircleHeart,
   Images,
@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 
 const NAV_ITEMS = [
   { path: "/", icon: Heart, label: "Tình yêu" },
-  { path: "/map", icon: MapPin, label: "Bản đồ" },
+  { path: "/cycle", icon: Droplet, label: "Chu kỳ" },
   { path: "/diary", icon: BookHeart, label: "Nhật ký" },
   { path: "/photos", icon: Images, label: "Ảnh" },
   { path: "/wishlist", icon: Star, label: "Ước mơ" },
